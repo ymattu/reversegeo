@@ -1,0 +1,188 @@
+---
+title: "逆ジオコーディング"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  message = FALSE,
+  fig.path = "README-"
+)
+```
+## 準備
+### ディレクトリの設定、桁数の設定
+```{r}
+setwd("~/Desktop/reversegeo")
+options(digits = 15)
+```
+### パッケージのインストール
+```{r, eval=FALSE}
+# パッケージが入っている場合は飛ばして良い
+install.packages(c("tidyverse", "sf", "devtools", "githubinstall", "knitr"))
+githubinstall::githubinstall("pforeeach")
+```
+### パッケージの読み込み
+```{r}
+library(tidyverse) # データ処理とか色々
+library(sf) # 地理情報データのため
+library(pforeach) # マルチコア処理のため
+library(knitr) # きれいな出力のkable()関数のため
+```
+
+## 関数を定義
+### 都道府県の判定
+```{r}
+#' @param polygon list
+#' @param lon longitude
+#' @param lat latitude
+find_pref2 <- function(polygon, lon, lat){
+  point <- st_point(c(lon, lat))
+  for(p in pref){
+    if(length(st_contains(polygon[[p]], point)[[1]])){
+      return(p)
+    }
+  }
+  return(NA)
+}
+```
+### 住所(何丁目レベル)判定
+```{r}
+#' @param sp_polygon object of class sf, sfc or sfg
+#' @param pref prefecture
+#' @param lon longitude
+#' @param lat latitude
+find_place <- function(sp_polygon, pref, lon, lat) {
+  
+  if(is.na(pref) == TRUE) {
+    return(NA)
+  }
+  
+  sp_pref <- sp_polygon %>%
+    dplyr::mutate_if(is.factor, as.character) %>%
+    filter(KEN_NAME == pref)
+  
+  which.row <- suppressMessages(sf::st_contains(sp_pref, sf::st_point(c(lon, lat)), sparse = FALSE)) %>%
+    grep(TRUE, .)
+  
+  if (identical(which.row, integer(0)) == TRUE) {
+    return(NA)
+  } else {
+    geos <- sp_pref[which.row, ]
+    
+    place_name = paste(geos$GST_NAME,
+                       geos$CSS_NAME,
+                       geos$MOJI,
+                       sep = ",") %>%
+      stringr::str_replace_all("NA", "")
+    return(place_name)
+  }
+}
+```
+### 県と市区町村、番地を検索
+```{r}
+#' @param polygon polygon list
+#' @param sp 番地レベルshapefile
+#' @param longitude 経度
+#' @param latitude 緯度
+find_pref_place <- function(polygon, sp2, longitude, latitude) {
+  pref <- find_pref2(polygon, longitude, latitude)
+  if(is.na(pref) == TRUE) {
+    return(NA)
+  }
+  city_banchi <- find_place(sp2, pref, longitude, latitude)
+  return(paste(pref, city_banchi, sep = ","))
+}
+```
+
+##　シェープファイルなど必要なデータセットづくり
+### 都道府県検索のためのデータ
+全国47都道府県の検索が可能
+```{r}
+# 都道府県のshapefile読み込み
+load("jp.RData")
+japan_p <- select(jp, KEN)
+pref <- unique(jp$KEN)
+# 都道府県ごとにポリゴンをまとめる
+pref_polygons <- tapply(japan_p$geometry,
+                        japan_p$KEN, # 都道府県名でグループ化
+                        st_combine)
+```
+
+### 市区町村レベルまで探すためのデータ
+検索可能なのは以下の11都府県(全国に拡充予定)
+- 福島県
+- 茨城県
+- 栃木県
+- 群馬県
+- 埼玉県
+- 千葉県
+- 東京都
+- 神奈川県
+- 山梨県
+- 長野県
+- 静岡県'
+```{r}
+# 市区町村レベルのshapefileの読み込み
+load("dfsbind.rdata")
+```
+
+## 逆ジオコーディング
+### 単純な1地点(例: よこはま動物園ズーラシア)
+よこはま動物園ズーラシアの住所は **神奈川県横浜市旭区上白根町1175−1**
+```{r}
+find_pref_place(pref_polygons, dfsbind, 139.526510, 35.494865)
+
+# 時間を計測
+system.time(find_pref_place(pref_polygons, dfsbind, 139.526510, 35.494865))
+```
+
+1件0.5秒ほど
+
+### データフレームの場合
+#### サンプルデータの作成
+```{r}
+dat <- data_frame(id = c(1:4),
+                  long = c(139.884678, 139.742946, 135.728965, 139.526510),
+                  lat = c(35.626065, 35.649114, 35.039200, 35.494865),
+                  location = c("東京ディズニーシー", "慶應義塾大学",　"金閣寺", "よこはま動物園ズーラシア"))
+kable(dat)
+```
+
+#### 逆ジオコーディング
+一件にそれなりの時間がかかるので、データフレームで逆ジオコーディングをするとき、特に行数が多いときはマルチコア処理をしたほうがよい。
+```{r}
+ res <- pforeach(row = rows(dat), .c = rbind)({
+   row %>%
+     mutate(place = find_pref_place(pref_polygons, dfsbind, long, lat)) %>%
+     separate(place, c("pref", "city", "town", "banchi"), sep = ",")
+ })
+res[res == ""] <- NA
+res[res == "NA"] <- NA
+kable(res)
+```
+
+都道府県以上のレベルでは上記11都府県以外は現状できないので NA になる。
+
+都道府県だけでいいなら下記。
+```{r, eval=FALSE}
+res <- pforeach(row = rows(dat), .c = rbind)({
+   row %>%
+     mutate(pref = find_pref(pref_polygons, long, lat))
+ })
+```
+
+#### 速度は？
+1000行で4分弱。都道府県だけなら1分ほど。
+
+## 検証環境
+3.1GHz Core i7, メモリ16ギガ, 2コア
+```{r}
+devtools::session_info()
+```
+
+### 参考
+- http://qiita.com/nozma/items/808bce2f496eabd50ff1
+- http://y-mattu.hatenablog.com/entry/2017/07/18/020123
+
