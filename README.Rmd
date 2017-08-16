@@ -155,11 +155,11 @@ kable(dat)
 #### 逆ジオコーディング
 一件にそれなりの時間がかかるので、データフレームで逆ジオコーディングをするとき、特に行数が多いときはマルチコア処理をしたほうがよい。
 ```{r}
- res <- pforeach(row = rows(dat), .c = rbind)({
-   row %>%
-     mutate(place = find_pref_place(pref_polygons, dfsbind, long, lat)) %>%
-     separate(place, c("pref", "city", "town", "banchi"), sep = ",")
- })
+res <- pforeach(row = rows(dat), .c = rbind)({
+  row %>%
+    mutate(place = find_pref_place(pref_polygons, dfsbind, long, lat)) %>%
+    separate(place, c("pref", "city", "town", "banchi"), sep = ",")
+})
 res[res == ""] <- NA
 res[res == "NA"] <- NA
 kable(res)

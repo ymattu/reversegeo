@@ -152,8 +152,8 @@ find_pref_place(pref_polygons, dfsbind, 139.526510, 35.494865)
 
 # 時間を計測
 system.time(find_pref_place(pref_polygons, dfsbind, 139.526510, 35.494865))
-#>                user              system             elapsed 
-#> 0.47399999999999931 0.00999999999999995 0.50099999999999945
+#>    user  system elapsed 
+#>   0.476   0.011   0.499
 ```
 
 1件0.5秒ほど
@@ -182,11 +182,11 @@ kable(dat)
 一件にそれなりの時間がかかるので、データフレームで逆ジオコーディングをするとき、特に行数が多いときはマルチコア処理をしたほうがよい。
 
 ``` r
- res <- pforeach(row = rows(dat), .c = rbind)({
-   row %>%
-     mutate(place = find_pref_place(pref_polygons, dfsbind, long, lat)) %>%
-     separate(place, c("pref", "city", "town", "banchi"), sep = ",")
- })
+res <- pforeach(row = rows(dat), .c = rbind)({
+  row %>%
+    mutate(place = find_pref_place(pref_polygons, dfsbind, long, lat)) %>%
+    separate(place, c("pref", "city", "town", "banchi"), sep = ",")
+})
 res[res == ""] <- NA
 res[res == "NA"] <- NA
 kable(res)
