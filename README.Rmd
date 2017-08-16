@@ -111,7 +111,8 @@ pref_polygons <- tapply(japan_p$geometry,
 ```
 
 ### 市区町村レベルまで探すためのデータ
-検索可能なのは以下の11都府県(全国に拡充予定)
+検索可能なのは以下の11都府県(今後、全国に拡充予定)
+
 - 福島県
 - 茨城県
 - 栃木県
@@ -122,7 +123,8 @@ pref_polygons <- tapply(japan_p$geometry,
 - 神奈川県
 - 山梨県
 - 長野県
-- 静岡県'
+- 静岡県
+
 ```{r}
 # 市区町村レベルのshapefileの読み込み
 load("dfsbind.rdata")
