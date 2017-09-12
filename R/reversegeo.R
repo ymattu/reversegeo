@@ -6,6 +6,7 @@ options(digits = 15)
 library(tidyverse)
 library(sf)
 library(pforeach) #githubinstall::githubinstall("pforeach")
+library(haven)
 
 ############
 # 関数定義 #
@@ -74,7 +75,7 @@ find_pref_place <- function(polygon, sp2, longitude, latitude) {
 
 
 # 都道府県のshapefile読み込み
-load("jp.RData")
+load("./R/jp.RData")
 japan_p <- select(jp, KEN)
 pref <- unique(jp$KEN)
 # 都道府県ごとにポリゴンをまとめる
@@ -83,4 +84,5 @@ pref_polygons <- tapply(japan_p$geometry,
                         st_combine)
 
 # 市区町村レベルのshapefileの読み込み
-load("dfsbind.rdata")
+load("./R/dfsbind.RData")
+st_write(dfsbind, "dfsbind.shp", layer_options = "ENCODING=UTF-8")
