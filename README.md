@@ -5,7 +5,7 @@
 R と Python による逆ジオコーディングについて、特に shapefile を使った方法についてまとめたものです。
 
 # ファイル構成
-- benchmark: **実行時間などを含めて解析に必要なコードをまとめたもの。一番のメイン。**ファイルをクリックすれば Web 上で見られる。
+- benchmark: **実行時間などを含めて解析に必要なコードをまとめたもの。一番のメイン。** ファイルをクリックすれば Web 上で見られる。
     - benchmark_Python.ipynb: Python 版
     - benchmark_R.ipynb: R 版
 - Python: Python に関するスクリプト
