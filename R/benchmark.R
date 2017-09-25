@@ -3,8 +3,7 @@ library(sf)
 library(tidyverse)
 library(pforeach)
 
-df <- read_csv('data/latlong_sample.csv') %>%
-  head(1000)
+df <- read_csv('./dat1000.csv') %>%
 
 system.time(
   res <- pforeach(row = rows(df), .c = rbind)({
