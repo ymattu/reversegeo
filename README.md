@@ -10,7 +10,7 @@ R と Python による逆ジオコーディングについて、特に shapefile
     - benchmark_R.ipynb: R 版
 - Python: Python に関するスクリプト
     - `benchmark.py`: ベンチマークを取るためのファイル(下書き)
-    - `rversegeo.py`: Python による逆ジオコーディングの関数と使用例をまとめたファイル
+    - `reversegeo.py`: Python による逆ジオコーディングの関数と使用例をまとめたファイル
 - R: R に関するスクリプトとデータ
     - `benchmark.R`: ベンチマークを取るためのファイル(下書き)
     - `reversegeo.R`: R による逆ジオコーディングの関数と使用例をまとめたファイル
