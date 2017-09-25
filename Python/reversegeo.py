@@ -1,6 +1,7 @@
 import geopandas as gpd
 from geopandas.geoseries import *
 
+
 def reverse_geo(shdf, lon, lat):
     """
     逆ジオコーディング
@@ -9,12 +10,12 @@ def reverse_geo(shdf, lon, lat):
     """
     polygon = shdf['geometry']
     point = Point(lon, lat)
-    
+
     whichtrue = polygon.contains(point)
     whichrow = whichtrue[whichtrue == True].index
 
     geos = shdf.ix[whichrow]
-    
+
     if geos.empty == True:
         return(None)
 
@@ -24,7 +25,7 @@ def reverse_geo(shdf, lon, lat):
                geos['MOJI'].to_string(index=False)]
 
     res = ','.join(reslist)
-    
+
     return(res)
 
 shdf2 = gpd.read_file('~/Desktop/A002005212015DDSWC12227/h27ka12227.shp')

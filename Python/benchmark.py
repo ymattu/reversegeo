@@ -42,6 +42,7 @@ sh = gpd.read_file('/Users/matsumurayuuya/Desktop/reversegeo/shp/dfsbind.shp')
 # 普通に計算
 df1000['place'] = df1000.apply(lambda x: reverse_geo(sh, x['longitude'], x['latitude']), axis = 1)
 
+
 # 並列化
 def split_parallel(df, num_split, map_func):
     p = Pool(multiprocessing.cpu_count())

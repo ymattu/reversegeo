@@ -32,23 +32,23 @@ find_pref2 <- function(polygon, lon, lat){
 #' @param lon longitude
 #' @param lat latitude
 find_place <- function(sp_polygon, pref, lon, lat) {
-  
+
   if(is.na(pref) == TRUE) {
     return(NA)
   }
-  
+
   sp_pref <- sp_polygon %>%
     dplyr::mutate_if(is.factor, as.character) %>%
     filter(KEN_NAME == pref)
-  
+
   which.row <- suppressMessages(sf::st_contains(sp_pref, sf::st_point(c(lon, lat)), sparse = FALSE)) %>%
     grep(TRUE, .)
-  
+
   if (identical(which.row, integer(0)) == TRUE) {
     return(NA)
   } else {
     geos <- sp_pref[which.row, ]
-    
+
     place_name = paste(geos$GST_NAME,
                        geos$CSS_NAME,
                        geos$MOJI,
@@ -85,4 +85,9 @@ pref_polygons <- tapply(japan_p$geometry,
 
 # 市区町村レベルのshapefileの読み込み
 load("./R/dfsbind.RData")
-st_write(dfsbind, "dfsbind.shp", layer_options = "ENCODING=UTF-8")
+load("./R/zenkoku.RData")
+
+system.time(
+find_pref_place(pref_polygons, zenkoku, 135.728965, 35.039200)
+)
+
