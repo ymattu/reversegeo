@@ -14,7 +14,7 @@ R と Python による逆ジオコーディングについて、特に shapefile
 - R: R に関するスクリプトとデータ
     - `benchmark.R`: ベンチマークを取るためのファイル(下書き)
     - `reversegeo.R`: R による逆ジオコーディングの関数と使用例をまとめたファイル
-    - `jp.RData` 市区町村境界のシェイプファイルを読み込んだ sf オブジェクト([こちらからダウンロードした](https://www.esrij.com/products/japan-shp/))
+    - `jp.RData` 市区町村境界のシェイプファイルを読み込んだ sf オブジェクト([こちら](https://www.esrij.com/products/japan-shp/)からダウンロードした)
     - `dfsbind.RData` 首都圏(とその周辺の県)の番地レベルの境界データ(sf オブジェクト)
         -   福島県
         -   茨城県
