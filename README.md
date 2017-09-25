@@ -33,7 +33,7 @@ R と Python による逆ジオコーディングについて、特に shapefile
 ## GitHub にはないファイル
 容量の関係で Github には上げられないけど必要、もしくは場合に応じて必要なファイル
 
-[こちら]l(https://drive.google.com/drive/folders/0B08TCnGdQZDWU2RoR0VBTW8yRHM?usp=sharing)からダウンロードする
+[こちら](https://drive.google.com/drive/folders/0B08TCnGdQZDWU2RoR0VBTW8yRHM?usp=sharing)からダウンロードする
 
 - `R/zenkoku.RData`: 全国の番地レベルのシェイプファイル(`zenkoku_shp/zenkoku.shp`)を読み込んだもの(sf オブジェクト)
 - shpdir: 全国市区町村の番地レベルシェイプファイルおよび関連ファイルお収めたフォルダ
